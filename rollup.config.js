@@ -10,7 +10,7 @@ const name = pkg.name
 export default [{
     input: 'src/main.js',
     output: [
-        {file: "src/main/resources/plugin-ui/server.mjs", 'format': 'es'},
+        {file: process.env.DEV ? "server.mjs" : "src/main/resources/plugin-ui/server.mjs", 'format': 'es'},
         // { file: pkg.main, 'format': 'umd', name }
     ],
     plugins: [
@@ -26,7 +26,7 @@ export default [{
 }, {
     input: 'src/main.js',
     output: [
-        {file: "src/main/resources/plugin-ui/client.mjs", 'format': 'es', name},
+        {file: process.env.DEV ? "client.mjs" : "src/main/resources/plugin-ui/client.mjs", 'format': 'es', name},
         // { file: pkg.main, 'format': 'umd', name }
     ],
     plugins: [

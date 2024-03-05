@@ -8,3 +8,5 @@ build
 .DS_Store
 node_modules
 src/main/resources/plugin-ui
+
+/*.mjs
