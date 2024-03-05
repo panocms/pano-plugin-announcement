@@ -36,6 +36,12 @@ dependencies {
 }
 
 tasks {
+    register("buildWithUI", Exec::class) {
+        commandLine("yarn")
+        commandLine("yarn", "build")
+        finalizedBy("build")
+    }
+
     shadowJar {
         val pluginId: String by project
         val pluginClass: String by project

@@ -62,18 +62,18 @@ jobs:
           distribution: temurin
           java-version: 8
 
-      - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: |
-            build
-            -Pversion=${{ needs.get-next-version.outputs.new_tag_version }}
-            -PtimeStamp=${{ steps.time.outputs.time }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
+
+      - name: Build with Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: |
+            buildWithUI
+            -Pversion=${{ needs.get-next-version.outputs.new_tag_version }}
+            -PtimeStamp=${{ steps.time.outputs.time }}
 
       - name: Release
         env:
