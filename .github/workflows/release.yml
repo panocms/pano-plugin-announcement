@@ -67,11 +67,14 @@ jobs:
         with:
           node-version: "lts/*"
 
+      - name: Yarn & Build UI
+        run: npm install -g yarn && yarn && yarn build
+
       - name: Build with Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           arguments: |
-            buildWithUI
+            build
             -Pversion=${{ needs.get-next-version.outputs.new_tag_version }}
             -PtimeStamp=${{ steps.time.outputs.time }}
 

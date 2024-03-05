@@ -37,8 +37,9 @@ dependencies {
 
 tasks {
     register("buildWithUI", Exec::class) {
-        commandLine("yarn")
-        commandLine("yarn", "build")
+        doFirst {
+            commandLine("yarn", "build")
+        }
         finalizedBy("build")
     }
 
