@@ -22,7 +22,10 @@ export default [{
             emitCss: false
         }),
         resolve()
-    ]
+    ],
+    watch: {
+        include: "src/**"
+    }
 }, {
     input: 'src/main.js',
     output: [
@@ -38,5 +41,8 @@ export default [{
             emitCss: false
         }),
         resolve()
-    ]
+    ],
+    watch: {
+        include: "src/**"
+    }
 }];
