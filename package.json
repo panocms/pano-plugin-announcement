@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^9.0.0",
-    "crossenv": "^0.0.2-security",
+    "cross-env": "^7.0.3",
     "rollup": "^2.60.0",
     "rollup-plugin-svelte": "^7.1.0",
     "svelte": "^3.44.1"
