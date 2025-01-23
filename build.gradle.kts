@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
-    kotlin("kapt") version "2.0.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm") version "2.1.0"
+    kotlin("kapt") version "2.1.0"
+    id("com.gradleup.shadow") version "8.3.5"
     `maven-publish`
 }
 
