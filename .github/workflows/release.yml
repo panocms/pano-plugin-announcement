@@ -62,13 +62,13 @@ jobs:
           distribution: temurin
           java-version: 8
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "lts/*"
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Yarn & Build UI
-        run: npm install -g yarn && yarn && yarn build
+      - name: Install
+        run: bun install
+
+      - name: Build
+        run: bun run build
 
       - name: Build with Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -81,4 +81,4 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-        run: npx semantic-release
+        run: bunx semantic-release
