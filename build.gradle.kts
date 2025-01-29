@@ -66,33 +66,6 @@ dependencies {
 tasks {
     register("installBun") {
         doLast {
-            val isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows
-
-            // 1. Check for system-wide Bun installation
-            val systemBunPath = try {
-                val checkCommand = if (isWindows) listOf("where", "bun") else listOf("which", "bun")
-                val process = Runtime.getRuntime().exec(checkCommand.toTypedArray())
-                val path = process.inputStream.bufferedReader().readLine()?.trim()
-                if (process.waitFor() == 0 && path != null && File(path).exists()) {
-                    path
-                } else {
-                    null
-                }
-            } catch (e: Exception) {
-                null
-            }
-
-            // 2. Use system-wide Bun if available
-            if (systemBunPath != null) {
-                val bunFile = File(systemBunPath)
-                if (bunFile.canExecute()) {
-                    println("✅ Using system-wide Bun: $systemBunPath")
-                    bunBin = bunFile
-                    return@doLast
-                }
-            }
-
-            // 3. Fallback to downloaded Bun
             if (!bunBin.exists()) {
                 println("🚀 Couldn't find Bun, downloading: $bunUrl")
 
