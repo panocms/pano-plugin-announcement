@@ -18,7 +18,6 @@ val handlebarsVersion: String by project
 val bootstrap = (project.findProperty("bootstrap") as String?)?.toBoolean() ?: false
 val pluginsDir: File? by rootProject.extra
 
-
 val os = System.getProperty("os.name").lowercase()
 val arch = System.getProperty("os.arch").lowercase()
 
@@ -103,20 +102,20 @@ tasks {
     }
 
     register("zipPluginUI", Zip::class) {
-        dependsOn("buildUI")
+        dependsOn("buildUI") // Önce UI build edilsin
 
-        val buildDir = layout.buildDirectory.asFile
-
-        from("$buildDir/resources/main/plugin-ui")
+        from("src/main/resources/plugin-ui")
         archiveFileName.set("plugin-ui.zip")
-        destinationDirectory.set(file("$buildDir/resources/main"))
+        destinationDirectory.set(file("src/main/resources"))
 
         doLast {
-            val pluginUIFolder = file("$buildDir/resources/main/plugin-ui")
+            val pluginUIFolder = file("src/main/resources/plugin-ui")
             if (pluginUIFolder.exists()) {
                 pluginUIFolder.deleteRecursively()
             }
         }
+
+        outputs.upToDateWhen { false }
     }
 
     shadowJar {
@@ -171,6 +170,10 @@ tasks {
 }
 
 tasks.named("build") {
+    dependsOn("zipPluginUI")
+}
+
+tasks.named("processResources") {
     dependsOn("zipPluginUI")
 }
 

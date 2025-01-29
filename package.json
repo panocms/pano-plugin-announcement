@@ -9,11 +9,12 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "cross-env": "^7.0.3",
-    "rollup": "^2.60.0",
-    "rollup-plugin-svelte": "^7.1.0",
-    "svelte": "^3.44.1"
+    "rollup": "^4.32.1",
+    "rollup-plugin-delete": "^2.1.0",
+    "rollup-plugin-svelte": "^7.2.2",
+    "svelte": "^5.19.4"
   },
   "keywords": [
     "svelte"
