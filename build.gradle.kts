@@ -1,3 +1,5 @@
+import java.net.URL
+
 plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("kapt") version "2.1.0"
@@ -15,6 +17,33 @@ val gsonVersion: String by project
 val handlebarsVersion: String by project
 val bootstrap = (project.findProperty("bootstrap") as String?)?.toBoolean() ?: false
 val pluginsDir: File? by rootProject.extra
+
+
+val os = System.getProperty("os.name").lowercase()
+val arch = System.getProperty("os.arch").lowercase()
+
+val isWindows = os.contains("win")
+val isMac = os.contains("mac")
+val isLinux = os.contains("nix") || os.contains("nux") || os.contains("linux")
+
+val isAarch64 = arch.contains("aarch64") || arch.contains("arm64")
+val isX64 = arch.contains("x86_64") || arch.contains("amd64")
+
+val bunVersion = "1.2.0"
+val bunPlatform = when {
+    isWindows && isX64 -> "bun-windows-x64"
+//    isWindows && isAarch64 -> "bun-windows-aarch64"
+    isMac && isX64 -> "bun-darwin-x64"
+    isMac && isAarch64 -> "bun-darwin-aarch64"
+    isLinux && isX64 -> "bun-linux-x64"
+    isLinux && isAarch64 -> "bun-linux-aarch64"
+    else -> throw RuntimeException("Unsupported OS or Architecture")
+}
+val bunUrl = "https://github.com/oven-sh/bun/releases/download/bun-v$bunVersion/$bunPlatform.zip"
+
+val bunDir = File(layout.buildDirectory.asFile.get().absolutePath, "bun" + File.separator + bunPlatform)
+val bunBin = if (isWindows) File(bunDir, "bun.exe") else File(bunDir, "bun")
+
 
 repositories {
     mavenCentral()
@@ -36,11 +65,58 @@ dependencies {
 }
 
 tasks {
-    register("buildWithUI", Exec::class) {
-        doFirst {
-            commandLine("yarn", "build")
+    register("installBun") {
+        doLast {
+            println(bunBin)
+            if (!bunBin.exists()) {
+                println("🚀 Couldn't find Bun, downloading: $bunUrl")
+
+                val zipFile = File(bunDir, "$bunPlatform.zip")
+                zipFile.parentFile.mkdirs()
+
+                URL(bunUrl).openStream().use { input ->
+                    zipFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+
+                copy {
+                    from(zipTree(zipFile))
+                    into(bunDir)
+                }
+
+                if (!isWindows) {
+                    bunBin.setExecutable(true)
+                }
+
+                zipFile.delete()
+                println("✅ Bun successfully downloaded: ${bunBin.absolutePath}")
+            } else {
+                println("✅ Bun is downloaded already: ${bunBin.absolutePath}")
+            }
         }
-        finalizedBy("build")
+    }
+
+    register("buildUI", Exec::class) {
+        dependsOn("installBun")
+        commandLine(bunBin.absolutePath, "run", "build")
+    }
+
+    register("zipPluginUI", Zip::class) {
+        dependsOn("buildUI")
+
+        val buildDir = layout.buildDirectory.asFile
+
+        from("$buildDir/resources/main/plugin-ui")
+        archiveFileName.set("plugin-ui.zip")
+        destinationDirectory.set(file("$buildDir/resources/main"))
+
+        doLast {
+            val pluginUIFolder = file("$buildDir/resources/main/plugin-ui")
+            if (pluginUIFolder.exists()) {
+                pluginUIFolder.deleteRecursively()
+            }
+        }
     }
 
     shadowJar {
@@ -92,6 +168,10 @@ tasks {
         dependsOn(shadowJar)
         dependsOn("copyJar")
     }
+}
+
+tasks.named("build") {
+    dependsOn("zipPluginUI")
 }
 
 publishing {
