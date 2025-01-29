@@ -40,9 +40,9 @@ val bunPlatform = when {
 }
 val bunUrl = "https://github.com/oven-sh/bun/releases/download/bun-v$bunVersion/$bunPlatform.zip"
 
-val bunDir = File(layout.buildDirectory.asFile.get().absolutePath, "bun" + File.separator + bunPlatform)
-val bunBin = if (isWindows) File(bunDir, "bun.exe") else File(bunDir, "bun")
-
+val bunDir = File(layout.buildDirectory.asFile.get().absolutePath, "bun")
+val bunBinDir = File(bunDir, bunPlatform)
+var bunBin = if (isWindows) File(bunBinDir, "bun.exe") else File(bunBinDir, "bun")
 
 repositories {
     mavenCentral()
@@ -66,7 +66,33 @@ dependencies {
 tasks {
     register("installBun") {
         doLast {
-            println(bunBin)
+            val isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows
+
+            // 1. Check for system-wide Bun installation
+            val systemBunPath = try {
+                val checkCommand = if (isWindows) listOf("where", "bun") else listOf("which", "bun")
+                val process = Runtime.getRuntime().exec(checkCommand.toTypedArray())
+                val path = process.inputStream.bufferedReader().readLine()?.trim()
+                if (process.waitFor() == 0 && path != null && File(path).exists()) {
+                    path
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                null
+            }
+
+            // 2. Use system-wide Bun if available
+            if (systemBunPath != null) {
+                val bunFile = File(systemBunPath)
+                if (bunFile.canExecute()) {
+                    println("✅ Using system-wide Bun: $systemBunPath")
+                    bunBin = bunFile
+                    return@doLast
+                }
+            }
+
+            // 3. Fallback to downloaded Bun
             if (!bunBin.exists()) {
                 println("🚀 Couldn't find Bun, downloading: $bunUrl")
 
@@ -98,6 +124,7 @@ tasks {
 
     register("buildUI", Exec::class) {
         dependsOn("installBun")
+        println(bunBin.absolutePath)
         commandLine(bunBin.absolutePath, "run", "build")
     }
 
