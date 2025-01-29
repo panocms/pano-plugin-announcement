@@ -102,7 +102,7 @@ tasks {
     }
 
     register("zipPluginUI", Zip::class) {
-        dependsOn("buildUI") // Önce UI build edilsin
+        dependsOn("buildUI")
 
         from("src/main/resources/plugin-ui")
         archiveFileName.set("plugin-ui.zip")
