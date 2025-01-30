@@ -201,9 +201,6 @@ publishing {
 }
 
 java {
-    withJavadocJar()
-    withSourcesJar()
-
     // Use Java 21 for compilation
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
