@@ -53,7 +53,7 @@ dependencies {
     if (bootstrap) {
         compileOnly(project(mapOf("path" to ":Pano")))
     } else {
-        compileOnly("com.github.panomc:pano:v1.0.0-alpha.68")
+        compileOnly("com.github.panomc:pano:v1.0.0-alpha.69")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
